@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { getReport, listRecorded, listRuns, startReplay } from './api'
+import { clearRecorded, getReport, listRecorded, listRuns, startReplay } from './api'
 import './App.css'
 
 function StatCard({ label, value, tone }) {
@@ -84,6 +84,19 @@ export default function App() {
     }
   }
 
+  async function clearAll() {
+    if (!window.confirm('Delete all recorded calls? Past replay runs stay.')) {
+      return
+    }
+    setError('')
+    try {
+      await clearRecorded()
+      await refresh()
+    } catch (e) {
+      setError(e.message)
+    }
+  }
+
   useEffect(() => {
     refresh()
   }, [])
@@ -96,6 +109,9 @@ export default function App() {
 
         <button className="primary" onClick={runReplay} disabled={loading}>
           {loading ? 'Replaying...' : 'Run replay'}
+        </button>
+        <button className="danger" onClick={clearAll} disabled={recordedCount === 0}>
+          Clear recordings
         </button>
 
         <h2>Run history</h2>
